@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Turunan</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.0.0/math.js"></script>
+    <link rel="icon" href="Preview.png" type="image/x-icon">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .calculator {
+            width: 450px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #aa151595;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-left: 20px; /* Memberikan jarak antara gambar dan kalkulator */
+            margin-top: 120px;
+            margin-right: 189px;
+        }
+        .display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow-x: auto; /* Memungkinkan pengguliran horizontal */
+            white-space: nowrap; /* Mencegah pembungkusan kata */
+            word-wrap: normal; /* Memastikan kata tidak dibungkus */
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 kolom */
+            grid-gap: 10px;
+        }
+        .buttons button {
+            padding: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            background-color: black;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 0px 9px black;
+            color: white;
+        }
+        .buttons button:hover {
+            background-color: #e0e0e0;
+        }
+        .buttons button:active {
+            background-color: #ccc;
+        }
+        .buttons button.double {
+            grid-column: span 2; /* Tombol yang mencakup dua kolom */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-right: 20px;
+        }
+        /* Tombol Information di sudut kanan atas */
+        .info-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-color: rgb(158, 126, 126);
+            color: #000;
+            font-size: 20px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0px 0px 10px black;
+            transition: background-color 0.3s ease;
+        }
+        .info-btn:hover {
+            background-color: blue;
+        }
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Background semi-transparan */
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Tombol Backspace dan lainnya di baris 7 dengan ukuran kecil */
+        .small-btn {
+            font-size: 20px;
+            padding: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="Preview.png" alt="Preview">
+        <div class="calculator">
+            <input id="display" type="text" class="display" disabled>
+            <div class="buttons">
+                <!-- Row 1 -->
+                <button onclick="appendToDisplay('1')">1</button>
+                <button onclick="appendToDisplay('2')">2</button>
+                <button onclick="appendToDisplay('3')">3</button>
+                <button onclick="appendToDisplay('+')">+</button>
+
+                <!-- Row 2 -->
+                <button onclick="appendToDisplay('4')">4</button>
+                <button onclick="appendToDisplay('5')">5</button>
+                <button onclick="appendToDisplay('6')">6</button>
+                <button onclick="appendToDisplay('-')">-</button>
+
+                <!-- Row 3 -->
+                <button onclick="appendToDisplay('7')">7</button>
+                <button onclick="appendToDisplay('8')">8</button>
+                <button onclick="appendToDisplay('9')">9</button>
+                <button onclick="appendToDisplay('*')">*</button>
+
+                <!-- Row 4 -->
+                <button onclick="appendToDisplay('0')">0</button>
+                <button onclick="appendToDisplay('.')">.</button>
+                <button onclick="appendToDisplay('x')">x</button>
+                <button onclick="appendToDisplay('/')">/</button>
+
+                <!-- Row 5 -->
+                <button onclick="appendToDisplay('y')">y</button>
+                <button onclick="appendToDisplay('sin(')">sin</button>
+                <button onclick="appendToDisplay('cos(')">cos</button>
+                <button onclick="appendToDisplay('tan(')">tan</button>
+
+                <!-- Row 6 -->
+                <button onclick="appendToDisplay('(')">(</button>
+                <button onclick="appendToDisplay(')')">)</button>
+                <button class="double" onclick="calculateResult()">=</button>
+                <button onclick="calculateDerivative()">Turunkan</button>
+
+                <!-- Row 7 -->
+                <button class="small-btn" onclick="clearDisplay()">C</button>
+                <button class="small-btn" onclick="appendToDisplay('^')">^</button>
+                <!-- Tombol Backspace -->
+                <button class="small-btn" onclick="backspace()">⌫</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Information -->
+    <button class="info-btn" onclick="showModal()">?</button>
+
+    <!-- Modal Informasi -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Informasi Kalkulator Turunan</h2>
+            <p>Kalkulator ini digunakan untuk menghitung turunan dari ekspresi matematika aljabar dan trigonometri.</p>
+            <ul>
+                <b> petunjuk penggunaan:</b> 
+                <li> untuk menghitung turunan trigonometri seperti sin, cos, dan tan gunnakan tanda <b>)</b> untuk akhir dari sebuah soal agar kalkulator dapat menghitungnya</li>
+                <li>Gunakan 'x' atau 'y' sebagai variabel.</li>
+                <li>Gunakan tombol 'Turunkan' untuk menghitung turunan.</li>
+                <li>Gunakan ekspresi seperti sin(x), cos(x), tan(x), dan lainnya.</li>
+                <b>catatan :</b>
+                <li> kalkulator ini belum bisa menghitung trigonometri berpangkat seperti sin^2, cos^2, dan tan^2</li>
+<li> kalkulator ini juga belum bisa menghitung soal yang banyak menggunakan tanda kurung contoh: sin(3x+4x(tan4x))</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk menambahkan input ke display
+        function appendToDisplay(value) {
+            document.getElementById("display").value += value;
+        }
+
+        // Fungsi untuk menghapus semua dari display
+        function clearDisplay() {
+            document.getElementById("display").value = '';
+        }
+
+        // Fungsi untuk menghitung turunan aljabar dan trigonometri
+        function calculateDerivative() {
+            let expression = document.getElementById("display").value;
+
+            try {
+                let expr = math.parse(expression.replace(/x/g, 'X').replace(/y/g, 'Y'));
+                let derivative;
+                if (expression.includes('y')) {
+                    derivative = math.derivative(expr, 'Y').toString();
+                } else {
+                    derivative = math.derivative(expr, 'X').toString();
+                }
+
+                derivative = derivative.replace(/\*/g, '');
+                document.getElementById("display").value = derivative.replace(/X/g, 'x').replace(/Y/g, 'y');
+            } catch (error) {
+                alert("Terjadi kesalahan dalam perhitungan turunan: " + error);
+            }
+        }
+
+        // Fungsi untuk menghitung hasil ekspresi
+        function calculateResult() {
+            let expression = document.getElementById("display").value;
+
+            try {
+                expression = expression.replace(/\^/g, '**');
+                expression = expression.replace(/y/g, 'Y');
+                let result = math.evaluate(expression.replace(/x/g, 'X').replace(/y/g, 'Y'));
+
+                document.getElementById("display").value = result;
+            } catch (error) {
+                alert("Terjadi kesalahan dalam perhitungan: " + error);
+            }
+        }
+
+        // Fungsi untuk menampilkan modal informasi
+        function showModal() {
+            document.getElementById("infoModal").style.display = "block";
+        }
+
+        // Fungsi untuk menutup modal
+        function closeModal() {
+            document.getElementById("infoModal").style.display = "none";
+        }
+
+        // Fungsi untuk menghapus karakter terakhir (backspace)
+        function backspace() {
+            let display = document.getElementById("display");
+            display.value = display.value.slice(0, -1);
+        }
+    </script>
+</body>
+</html>
